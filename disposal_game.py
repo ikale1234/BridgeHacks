@@ -20,16 +20,31 @@ class Label:
         self.text = text
         self.size = size
         self.font = pygame.font.SysFont('arial', size)
+        self.color = color
+        self.width, self.height = self.font.size(self.text)
         self.label = self.font.render(self.text, True, color, bgcolor)
         self.rect = self.label.get_rect()
-        self.rect.center = (x, y)
+        self.x = x
+        self.y = y
+        self.rect.center = (self.x, self.y)
+        self.inrect = False
+
+    def draw(self, win):
+        win.blit(self.label, self.rect)
+
+    def checkcursor(self, x, y, color):
+        if x > self.x - self.width/2 and x < self.x + self.width/2:
+            if y > self.y - self.height/2 and y < self.y + self.height/2:
+                self.label = self.font.render(
+                    self.text, True, self.color, color)
 
 
-game_text = "Where Do I Throw It?"
-font = pygame.font.SysFont('arial', 32)
-game_label = font.render(game_text, True, (0, 0, 255), (255, 0, 0))
-labelRect = game_label.get_rect()
-labelRect.center = (500, 200)
+game_label = Label("Where Do I Throw It?", 32,
+                   (0, 0, 0), (255, 255, 255), 500, 200)
+instructions_label = Label("Instructions", 20,
+                           (0, 0, 0), (255, 255, 255), 500, 450)
+play_label = Label("Play Game", 20,
+                   (0, 0, 0), (255, 255, 255), 500, 650)
 stage = 0
 
 
@@ -87,9 +102,15 @@ while run:
         if event.type == pygame.QUIT:
             run = False
     key = pygame.key.get_pressed()
+    x, y = pygame.mouse.get_pos()
+
     if stage == 0:
-        win.blit(game_label, labelRect)
+
+        game_label.draw(win)
+        instructions_label.draw(win)
+        play_label.draw(win)
         pygame.display.update()
+
     if stage == 1:
         # movement
         if key[pygame.K_LEFT]:
