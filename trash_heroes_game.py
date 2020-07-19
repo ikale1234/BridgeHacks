@@ -127,6 +127,10 @@ class Game:
         self.back_to_start = Label("Return to Title Screen", 20,
                                    (0, 0, 0), (255, 255, 255), 500, 700)
         self.bgcolor = (255, 255, 255)
+        self.music = pygame.mixer.music.load("sound.mp3")
+        pygame.mixer.music.play(-1)
+        self.wrongsound = pygame.mixer.Sound("wrong.wav")
+        self.rightsound = pygame.mixer.Sound("correct.wav")
 
     # item creation
         for i in range(30):
@@ -146,13 +150,11 @@ class Game:
     def correct(self):
         self.points += 1
         self.score.changecolor((0, 255, 0))
-        self.sound = pygame.mixer.music.load(
-            "correct.mp3")
+        self.rightsound.play()
 
     def wrong(self):
         self.score.changecolor((255, 0, 0))
-        self.sound = pygame.mixer.music.load(
-            "wrong.mp3")
+        self.wrongsound.play()
 
     def rungame(self):
         while self.run:
@@ -230,7 +232,6 @@ class Game:
                                     self.correct()
                                 else:
                                     self.wrong()
-                            pygame.mixer.music.play()
                     if self.hitcan.y > 900:
                         self.score.changecolor((0, 0, 0))
             # difficulty increasing with skill
