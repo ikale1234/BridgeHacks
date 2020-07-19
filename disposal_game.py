@@ -1,27 +1,21 @@
 import pygame
 import random
 import os
-
-
-def getPic():
-    pictureDirectory = ["recycle", "trash", "yardtrim"]
-    trashTypeNum = random.randrange(0, 3)
-    trashType = os.listdir(pictureDirectory[trashTypeNum])
-    randomPic = trashType[random.randrange(0, len(trashType))]
-    path = os.path.join(pictureDirectory[trashTypeNum], randomPic)
-    return path, trashTypeNum
+import randompictest
 
 
 win = pygame.display.set_mode((1000, 900))
-pygame.display.set_caption("Osu")
+pygame.display.set_caption("Where do I throw it?")
 pygame.init()
 run = True
 item_list = []
 trashcan = pygame.image.load('trashcan.png')
 recyclebin = pygame.image.load('recycle.png')
+yardtrimmings = pygame.image.load('yard.png')
 points = 0
 colorchoices = [(255, 0, 0), (0, 0, 255)]
 stage = 0
+mousedown = 0
 
 
 class Label:
@@ -57,6 +51,11 @@ class Label:
                 self.text, True, self.color, self.bgcolor)
             self.inrect = False
 
+    def changetext(self, text):
+        self.label = self.font.render(text, True, self.color, self.bgcolor)
+        self.rect = self.label.get_rect()
+        self.rect.center = (self.x, self.y)
+
 # label variables
 
 
@@ -73,27 +72,40 @@ sentence1 = Label("The objective is to catch the falling items in the correct bi
                   (0, 0, 0), (255, 255, 255), 500, 350)
 sentence2 = Label("You can move the bin with the right and left arrows.", 20,
                   (0, 0, 0), (255, 255, 255), 500, 425)
-sentence3 = Label("You can switch bins with these keybinds: Q = Trash Can, W = Recycling Bin, E = Garden Scraps Bin.", 20,
+sentence3 = Label("You can switch bins with these keybinds: 1 = Trash Can, 2 = Recycling Bin, 3 = Yard Trimmings Bin.", 20,
                   (0, 0, 0), (255, 255, 255), 500, 500)
 stage = 0
 
+score = Label("Score: "+str(points), 32, (0, 0, 0), (255, 255, 255), 500, 50)
 
-class circle:
+play_again = Label("Play Again", 20,
+                   (0, 0, 0), (255, 255, 255), 500, 600)
+final_score = Label("Your Final Score", 32, (0, 0, 0),
+                    (255, 255, 255), 500, 250)
+
+back_to_start = Label("Return to Title Screen", 20,
+                      (0, 0, 0), (255, 255, 255), 500, 700)
+
+count = 0
+
+
+class image:
     def __init__(self, x, y):
+        global count
         self.x = x
         self.y = y
+
         self.rad = 40
 
         self.vis = True
-        self.color = random.choice(colorchoices)
-        if self.color == colorchoices[0]:
-            self.index = 0
-        else:
-            self.index = 1
+        self.path, self.index = randompictest.getPic()
+        print("hi", count)
+        count += 1
+        self.image = pygame.image.load(self.path)
 
     def draw(self, win):
         if self.vis:
-            pygame.draw.circle(win, self.color, (self.x, self.y), self.rad)
+            win.blit(self.image, (self.x, self.y))
 
 
 class Can:
@@ -107,6 +119,8 @@ class Can:
             win.blit(trashcan, (self.x, self.y))
         elif self.form == "recycle":
             win.blit(recyclebin, (self.x, self.y))
+        elif self.form == "garden":
+            win.blit(yardtrimmings, (self.x, self.y))
 
     def change(self, form):
         self.form = form
@@ -114,7 +128,7 @@ class Can:
 
 # item creation
 for i in range(30):
-    item_list.append(circle(random.randrange(75, 925), -200 - 500*i))
+    item_list.append(image(random.randrange(35, 885), -200 - 500*i))
 can = Can()
 
 
@@ -122,6 +136,8 @@ def drawgame():
     for item in item_list:
         item.draw(win)
     can.draw(win)
+    score.changetext("Score: "+str(points))
+    score.draw(win)
     pygame.display.update()
 
 
@@ -136,11 +152,15 @@ while run:
 
     if stage == 0:
         pygame.event.get()
-        if pygame.mouse.get_pressed() == (1, 0, 0):
+        if pygame.mouse.get_pressed() == (0, 0, 0):
+            mousedown = 0
+        if pygame.mouse.get_pressed() == (1, 0, 0) and mousedown == 0:
             if instructions_label.inrect:
                 stage = 2
+                instructions_label.inrect = False
             elif play_label.inrect:
                 stage = 1
+                play_again.inrect = False
         instructions_label.checkcursor(x, y, (0, 0, 255))
         play_label.checkcursor(x, y, (0, 0, 255))
         game_label.draw(win)
@@ -168,16 +188,16 @@ while run:
         if key[pygame.K_RIGHT]:
             can.x += 10
     # bin switch
-        if key[pygame.K_q]:
+        if key[pygame.K_1]:
             can.change("trash")
-        if key[pygame.K_w]:
+        if key[pygame.K_2]:
             can.change("recycle")
-        if key[pygame.K_e]:
+        if key[pygame.K_3]:
             can.change("garden")
     # can touch conditions
         for item in item_list:
-            if item.y > 670 and item.y < 730 and item.vis:
-                if item.x > can.x + 40 and item.x < can.x + 210:
+            if item.y + 40 > 700 and item.y + 40 < 750 and item.vis:
+                if item.x > can.x and item.x < can.x + 170:
                     item.vis = False
                     if can.form == "trash":
                         if item.index == 0:
@@ -185,8 +205,42 @@ while run:
                     if can.form == "recycle":
                         if item.index == 1:
                             points += 1
-                    print(points)
+                    if can.form == "garden":
+                        if item.index == 2:
+                            points += 1
         for item in item_list:
             item.y += 5
+        if item_list[29].y > 1000:
+            stage = 3
+            final_score.changetext("Your final score was " +
+                                   str(points) + " / " + str(len(item_list)) + ".")
         drawgame()
+    if stage == 3:
+        pygame.event.get()
+        if pygame.mouse.get_pressed() == (1, 0, 0):
+            if play_again.inrect:
+                stage = 1
+                item_list = []
+                for i in range(30):
+                    item_list.append(
+                        image(random.randrange(35, 885), -200 - 500*i))
+                can.change("trash")
+                points = 0
+                play_again.inrect = False
+            elif back_to_start.inrect:
+                stage = 0
+                item_list = []
+                for i in range(30):
+                    item_list.append(
+                        image(random.randrange(35, 885), -200 - 500*i))
+                can.change("trash")
+                points = 0
+                mousedown = 1
+                back_to_start.inrect = False
+        play_again.checkcursor(x, y, (0, 0, 255))
+        back_to_start.checkcursor(x, y, (0, 0, 255))
+        final_score.draw(win)
+        play_again.draw(win)
+        back_to_start.draw(win)
+        pygame.display.update()
 quit()

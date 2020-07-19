@@ -4,7 +4,7 @@ import os
 
 
 def getPic():
-    pictureDirectory = ["recycle", "trash", "yardtrim"]
+    pictureDirectory = ["trash", "recycle",  "yardtrim"]
     trashTypeNum = random.randrange(0, 3)
     trashType = os.listdir(pictureDirectory[trashTypeNum])
     randomPic = trashType[random.randrange(0, len(trashType))]
