@@ -99,7 +99,7 @@ class Game:
         self.mousedown = 0
 
     # label variables
-        self.game_label = Label("Where Do I Throw It?", 32,
+        self.game_label = Label("Trash Heroes", 32,
                                 (0, 0, 0), (255, 255, 255), 500, 200)
         self.instructions_label = Label("Instructions", 20,
                                         (0, 0, 0), (255, 255, 255), 500, 450)
