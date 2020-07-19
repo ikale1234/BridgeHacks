@@ -10,6 +10,3 @@ def getPic():
     randomPic = trashType[random.randrange(0, len(trashType))]
     path = os.path.join(pictureDirectory[trashTypeNum], randomPic)
     return path, trashTypeNum
-
-
-print(getPic())

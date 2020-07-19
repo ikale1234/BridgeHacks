@@ -121,6 +121,7 @@ class Game:
 
         self.back_to_start = Label("Return to Title Screen", 20,
                                    (0, 0, 0), (255, 255, 255), 500, 700)
+        self.bgcolor = (255, 255, 255)
 
     # item creation
         for i in range(30):
@@ -138,7 +139,7 @@ class Game:
 
     def rungame(self):
         while self.run:
-            win.fill((255, 255, 255))
+            win.fill(self.bgcolor)
             pygame.time.delay(10)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -199,13 +200,30 @@ class Game:
                             if self.can.form == "trash":
                                 if item.index == 0:
                                     self.points += 1
+                                    right = pygame.mixer.music.load(
+                                        "correct.mp3")
+                                else:
+                                    wrong = pygame.mixer.music.load(
+                                        "wrong.mp3")
                             if self.can.form == "recycle":
                                 if item.index == 1:
                                     self.points += 1
+                                    right = pygame.mixer.music.load(
+                                        "correct.mp3")
+                                else:
+                                    wrong = pygame.mixer.music.load(
+                                        "wrong.mp3")
                             if self.can.form == "garden":
                                 if item.index == 2:
                                     self.points += 1
+                                    right = pygame.mixer.music.load(
+                                        "correct.mp3")
+                                else:
+                                    wrong = pygame.mixer.music.load(
+                                        "wrong.mp3")
+                            pygame.mixer.music.play()
             # difficulty increasing with skill
+
                 if self.item_list[5].y < 1000:
                     self.speed = 2
                 if self.item_list[5].y > 1000 and self.item_list[5].y < 1100:
