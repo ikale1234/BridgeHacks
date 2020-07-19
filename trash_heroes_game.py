@@ -13,7 +13,7 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
-BLUE = (0, 0, 255)
+GRAY = (128, 128, 128)
 width = 1000
 height = 900
 win = pygame.display.set_mode((width, height))
@@ -110,8 +110,8 @@ class Game:
                         self.stage = GAME_STAGE
                         self.play_again.in_rect = False
                 self.instructions_label.checkcursor(
-                    self.x, self.y, BLUE)
-                self.play_label.checkcursor(self.x, self.y, BLUE)
+                    self.x, self.y, GRAY)
+                self.play_label.checkcursor(self.x, self.y, GRAY)
                 self.game_label.draw(win)
                 self.instructions_label.draw(win)
                 self.play_label.draw(win)
@@ -122,7 +122,7 @@ class Game:
                 if pygame.mouse.get_pressed() == (1, 0, 0):
                     if self.play_label.in_rect:
                         self.stage = GAME_STAGE
-                self.play_label.checkcursor(self.x, self.y, BLUE)
+                self.play_label.checkcursor(self.x, self.y, GRAY)
                 self.the_instructions.draw(win)
                 self.sentence1.draw(win)
                 self.sentence2.draw(win)
@@ -214,8 +214,8 @@ class Game:
                         self.points = 0
                         self.mouse_down = 1
                         self.back_to_start.in_rect = False
-                self.play_again.checkcursor(self.x, self.y, BLUE)
-                self.back_to_start.checkcursor(self.x, self.y, BLUE)
+                self.play_again.checkcursor(self.x, self.y, GRAY)
+                self.back_to_start.checkcursor(self.x, self.y, GRAY)
                 self.final_score.draw(win)
                 self.play_again.draw(win)
                 self.back_to_start.draw(win)
