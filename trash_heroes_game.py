@@ -3,9 +3,23 @@ import random
 from label_class import Label
 from item_class import Image
 from can_class import Can
-win = pygame.display.set_mode((1000, 900))
+
+
+TITLE_STAGE = 0
+GAME_STAGE = 1
+INSTRUCTION_STAGE = 2
+END_STAGE = 3
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
+width = 1000
+height = 900
+win = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Where do I throw it?")
 pygame.init()
+width/2
 
 
 class Game:
@@ -14,44 +28,43 @@ class Game:
         self.item_list = []
 
         self.points = 0
-        self.stage = 0
         self.mouse_down = 0
+        self.stage = TITLE_STAGE
 
-    # label variables
+        # label variables
         self.game_label = Label("Trash Heroes", 32,
-                                (0, 0, 0), (255, 255, 255), 500, 200)
+                                BLACK, WHITE, width/2, 200)
         self.instructions_label = Label("Instructions", 20,
-                                        (0, 0, 0), (255, 255, 255), 500, 450)
+                                        BLACK, WHITE, width/2, 450)
         self.play_label = Label("Play Game", 20,
-                                (0, 0, 0), (255, 255, 255), 500, 650)
+                                BLACK, WHITE, width/2, 650)
         self.the_instructions = Label("The Instructions", 32,
-                                      (0, 0, 0), (255, 255, 255), 500, 200)
+                                      BLACK, WHITE, width/2, 200)
 
         self.sentence1 = Label("The objective is to catch the falling items in the correct bin.", 20,
-                               (0, 0, 0), (255, 255, 255), 500, 350)
+                               BLACK, WHITE, width/2, 350)
         self.sentence2 = Label("You can move the bin with the right and left arrows.", 20,
-                               (0, 0, 0), (255, 255, 255), 500, 425)
+                               BLACK, WHITE, width/2, 425)
         self.sentence3 = Label("You can switch bins with these keybinds: 1 = Trash Can, 2 = Recycling Bin, 3 = Yard Trimmings Bin.", 20,
-                               (0, 0, 0), (255, 255, 255), 500, 500)
-        self.stage = 0
+                               BLACK, WHITE, width/2, 500)
 
         self.score = Label("Score: "+str(self.points), 32,
-                           (0, 0, 0), (255, 255, 255), 500, 50)
+                           BLACK, WHITE, width/2, 50)
 
         self.play_again = Label("Play Again", 20,
-                                (0, 0, 0), (255, 255, 255), 500, 600)
-        self.final_score = Label("Your Final Score", 32, (0, 0, 0),
-                                 (255, 255, 255), 500, 250)
+                                BLACK, WHITE, width/2, 600)
+        self.final_score = Label("Your Final Score", 32, BLACK,
+                                 WHITE, width/2, 250)
 
         self.back_to_start = Label("Return to Title Screen", 20,
-                                   (0, 0, 0), (255, 255, 255), 500, 700)
-        self.bg_color = (255, 255, 255)
+                                   BLACK, WHITE, width/2, 700)
+        self.bg_color = WHITE
         self.music = pygame.mixer.music.load("sound.mp3")
         pygame.mixer.music.play(-1)
         self.wrongsound = pygame.mixer.Sound("wrong.wav")
         self.rightsound = pygame.mixer.Sound("correct.wav")
 
-    # item creation
+        # Create items
         for i in range(30):
             self.item_list.append(
                 Image(random.randrange(35, 885), -200 - 500*i))
@@ -68,11 +81,11 @@ class Game:
 
     def correct(self):
         self.points += 1
-        self.score.changecolor((0, 255, 0))
+        self.score.changecolor(GREEN)
         self.rightsound.play()
 
     def wrong(self):
-        self.score.changecolor((255, 0, 0))
+        self.score.changecolor(RED)
         self.wrongsound.play()
 
     def rungame(self):
@@ -85,31 +98,31 @@ class Game:
             self.key = pygame.key.get_pressed()
             self.x, self.y = pygame.mouse.get_pos()
 
-            if self.stage == 0:
+            if self.stage == TITLE_STAGE:
                 pygame.event.get()
-                if pygame.mouse.get_pressed() == (0, 0, 0):
+                if pygame.mouse.get_pressed() == BLACK:
                     self.mouse_down = 0
                 if pygame.mouse.get_pressed() == (1, 0, 0) and self.mouse_down == 0:
                     if self.instructions_label.in_rect:
-                        self.stage = 2
+                        self.stage = INSTRUCTION_STAGE
                         self.instructions_label.in_rect = False
                     elif self.play_label.in_rect:
-                        self.stage = 1
+                        self.stage = GAME_STAGE
                         self.play_again.in_rect = False
                 self.instructions_label.checkcursor(
-                    self.x, self.y, (0, 0, 255))
-                self.play_label.checkcursor(self.x, self.y, (0, 0, 255))
+                    self.x, self.y, BLUE)
+                self.play_label.checkcursor(self.x, self.y, BLUE)
                 self.game_label.draw(win)
                 self.instructions_label.draw(win)
                 self.play_label.draw(win)
                 pygame.display.update()
 
-            if self.stage == 2:
+            if self.stage == INSTRUCTION_STAGE:
                 pygame.event.get()
                 if pygame.mouse.get_pressed() == (1, 0, 0):
                     if self.play_label.in_rect:
-                        self.stage = 1
-                self.play_label.checkcursor(self.x, self.y, (0, 0, 255))
+                        self.stage = GAME_STAGE
+                self.play_label.checkcursor(self.x, self.y, BLUE)
                 self.the_instructions.draw(win)
                 self.sentence1.draw(win)
                 self.sentence2.draw(win)
@@ -117,20 +130,22 @@ class Game:
                 self.play_label.draw(win)
                 pygame.display.update()
 
-            if self.stage == 1:
+            if self.stage == GAME_STAGE:
                 # movement
                 if self.key[pygame.K_LEFT]:
                     self.can.x -= 10
                 if self.key[pygame.K_RIGHT]:
                     self.can.x += 10
-            # bin switch
+
+                # bin switch
                 if self.key[pygame.K_1]:
                     self.can.change("trash")
                 if self.key[pygame.K_2]:
                     self.can.change("recycle")
                 if self.key[pygame.K_3]:
                     self.can.change("garden")
-            # can touch conditions
+
+                # can touch conditions
                 for item in self.item_list:
                     if item.y + 40 > 700 and item.y + 40 < 750 and item.visible:
                         if item.x > self.can.x and item.x < self.can.x + 170:
@@ -152,9 +167,9 @@ class Game:
                                 else:
                                     self.wrong()
                     if self.hitcan.y > 900:
-                        self.score.changecolor((0, 0, 0))
-            # difficulty increasing with skill
+                        self.score.changecolor(BLACK)
 
+                # difficulty increasing with skill
                 if self.item_list[5].y < 1000:
                     self.speed = 2
                 if self.item_list[5].y > 1000 and self.item_list[5].y < 1100:
@@ -177,11 +192,11 @@ class Game:
                     self.final_score.changetext("Your final score was " +
                                                 str(self.points) + " / " + str(len(self.item_list)) + ".")
                 self.drawgame()
-            if self.stage == 3:
+            if self.stage == END_STAGE:
                 pygame.event.get()
                 if pygame.mouse.get_pressed() == (1, 0, 0):
                     if self.play_again.in_rect:
-                        self.stage = 1
+                        self.stage = GAME_STAGE
                         self.item_list = []
                         for i in range(30):
                             self.item_list.append(
@@ -190,7 +205,7 @@ class Game:
                         self.points = 0
                         self.play_again.in_rect = False
                     elif self.back_to_start.in_rect:
-                        self.stage = 0
+                        self.stage = TITLE_STAGE
                         self.item_list = []
                         for i in range(30):
                             self.item_list.append(
@@ -199,8 +214,8 @@ class Game:
                         self.points = 0
                         self.mouse_down = 1
                         self.back_to_start.in_rect = False
-                self.play_again.checkcursor(self.x, self.y, (0, 0, 255))
-                self.back_to_start.checkcursor(self.x, self.y, (0, 0, 255))
+                self.play_again.checkcursor(self.x, self.y, BLUE)
+                self.back_to_start.checkcursor(self.x, self.y, BLUE)
                 self.final_score.draw(win)
                 self.play_again.draw(win)
                 self.back_to_start.draw(win)
