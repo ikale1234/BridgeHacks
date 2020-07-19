@@ -1,5 +1,16 @@
 import pygame
 import random
+import os
+
+
+def getPic():
+    pictureDirectory = ["recycle", "trash", "yardtrim"]
+    trashTypeNum = random.randrange(0, 3)
+    trashType = os.listdir(pictureDirectory[trashTypeNum])
+    randomPic = trashType[random.randrange(0, len(trashType))]
+    path = os.path.join(pictureDirectory[trashTypeNum], randomPic)
+    return path, trashTypeNum
+
 
 win = pygame.display.set_mode((1000, 900))
 pygame.display.set_caption("Osu")
@@ -12,24 +23,58 @@ points = 0
 colorchoices = [(255, 0, 0), (0, 0, 255)]
 stage = 0
 
-# label variables
-
 
 class Label:
     def __init__(self, text, size, color, bgcolor, x, y):
         self.text = text
         self.size = size
         self.font = pygame.font.SysFont('arial', size)
-        self.label = self.font.render(self.text, True, color, bgcolor)
+        self.color = color
+        self.width, self.height = self.font.size(self.text)
+        self.bgcolor = bgcolor
+        self.label = self.font.render(self.text, True, color, self.bgcolor)
         self.rect = self.label.get_rect()
-        self.rect.center = (x, y)
+        self.x = x
+        self.y = y
+        self.rect.center = (self.x, self.y)
+        self.inrect = False
+
+    def draw(self, win):
+        win.blit(self.label, self.rect)
+
+    def checkcursor(self, x, y, color):
+        if x > self.x - self.width/2 and x < self.x + self.width/2:
+            if y > self.y - self.height/2 and y < self.y + self.height/2:
+                self.label = self.font.render(
+                    self.text, True, self.color, color)
+                self.inrect = True
+            else:
+                self.label = self.font.render(
+                    self.text, True, self.color, self.bgcolor)
+                self.inrect = False
+        else:
+            self.label = self.font.render(
+                self.text, True, self.color, self.bgcolor)
+            self.inrect = False
+
+# label variables
 
 
-game_text = "Where Do I Throw It?"
-font = pygame.font.SysFont('arial', 32)
-game_label = font.render(game_text, True, (0, 0, 255), (255, 0, 0))
-labelRect = game_label.get_rect()
-labelRect.center = (500, 200)
+game_label = Label("Where Do I Throw It?", 32,
+                   (0, 0, 0), (255, 255, 255), 500, 200)
+instructions_label = Label("Instructions", 20,
+                           (0, 0, 0), (255, 255, 255), 500, 450)
+play_label = Label("Play Game", 20,
+                   (0, 0, 0), (255, 255, 255), 500, 650)
+the_instructions = Label("The Instructions", 32,
+                         (0, 0, 0), (255, 255, 255), 500, 200)
+
+sentence1 = Label("The objective is to catch the falling items in the correct bin", 20,
+                  (0, 0, 0), (255, 255, 255), 500, 350)
+sentence2 = Label("You can move the bin with the right and left arrows.", 20,
+                  (0, 0, 0), (255, 255, 255), 500, 425)
+sentence3 = Label("You can switch bins with these keybinds: Q = Trash Can, W = Recycling Bin, E = Garden Scraps Bin.", 20,
+                  (0, 0, 0), (255, 255, 255), 500, 500)
 stage = 0
 
 
@@ -87,9 +132,35 @@ while run:
         if event.type == pygame.QUIT:
             run = False
     key = pygame.key.get_pressed()
+    x, y = pygame.mouse.get_pos()
+
     if stage == 0:
-        win.blit(game_label, labelRect)
+        pygame.event.get()
+        if pygame.mouse.get_pressed() == (1, 0, 0):
+            if instructions_label.inrect:
+                stage = 2
+            elif play_label.inrect:
+                stage = 1
+        instructions_label.checkcursor(x, y, (0, 0, 255))
+        play_label.checkcursor(x, y, (0, 0, 255))
+        game_label.draw(win)
+        instructions_label.draw(win)
+        play_label.draw(win)
         pygame.display.update()
+
+    if stage == 2:
+        pygame.event.get()
+        if pygame.mouse.get_pressed() == (1, 0, 0):
+            if play_label.inrect:
+                stage = 1
+        play_label.checkcursor(x, y, (0, 0, 255))
+        the_instructions.draw(win)
+        sentence1.draw(win)
+        sentence2.draw(win)
+        sentence3.draw(win)
+        play_label.draw(win)
+        pygame.display.update()
+
     if stage == 1:
         # movement
         if key[pygame.K_LEFT]:
