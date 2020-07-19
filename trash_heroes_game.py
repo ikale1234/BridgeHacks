@@ -1,26 +1,26 @@
 import pygame
 import random
 import os
-import randompictest
+import choose_picture
 win = pygame.display.set_mode((1000, 900))
 pygame.display.set_caption("Where do I throw it?")
 pygame.init()
 
 
 class Label:
-    def __init__(self, text, size, color, bgcolor, x, y):
+    def __init__(self, text, size, color, bg_color, x, y):
         self.text = text
         self.size = size
         self.font = pygame.font.SysFont('arial', size)
         self.color = color
         self.width, self.height = self.font.size(self.text)
-        self.bgcolor = bgcolor
-        self.label = self.font.render(self.text, True, color, self.bgcolor)
+        self.bg_color = bg_color
+        self.label = self.font.render(self.text, True, color, self.bg_color)
         self.rect = self.label.get_rect()
         self.x = x
         self.y = y
         self.rect.center = (self.x, self.y)
-        self.inrect = False
+        self.in_rect = False
 
     def draw(self, win):
         win.blit(self.label, self.rect)
@@ -30,25 +30,25 @@ class Label:
             if y > self.y - self.height/2 and y < self.y + self.height/2:
                 self.label = self.font.render(
                     self.text, True, self.color, color)
-                self.inrect = True
+                self.in_rect = True
             else:
                 self.label = self.font.render(
-                    self.text, True, self.color, self.bgcolor)
-                self.inrect = False
+                    self.text, True, self.color, self.bg_color)
+                self.in_rect = False
         else:
             self.label = self.font.render(
-                self.text, True, self.color, self.bgcolor)
-            self.inrect = False
+                self.text, True, self.color, self.bg_color)
+            self.in_rect = False
 
     def changetext(self, text):
-        self.label = self.font.render(text, True, self.color, self.bgcolor)
+        self.label = self.font.render(text, True, self.color, self.bg_color)
         self.rect = self.label.get_rect()
         self.rect.center = (self.x, self.y)
 
     def changecolor(self, color):
         self.color = color
         self.label = self.font.render(
-            self.text, True, self.color, self.bgcolor)
+            self.text, True, self.color, self.bg_color)
 
 
 class image:
@@ -60,7 +60,7 @@ class image:
         self.rad = 40
 
         self.visible = True
-        self.path, self.index = randompictest.getPic()
+        self.path, self.index = choose_picture.getPic()
         self.image = pygame.image.load(self.path)
 
     def draw(self, win):
@@ -73,17 +73,17 @@ class Can:
         self.x = 400
         self.y = 700
         self.form = "trash"
-        self.trashcan = pygame.image.load('trashcan.png')
-        self.recyclebin = pygame.image.load('recycle.png')
-        self.yardtrimmings = pygame.image.load('yard.png')
+        self.trash_can = pygame.image.load('trashcan.png')
+        self.recycle_bin = pygame.image.load('recycle.png')
+        self.yard_trimmings = pygame.image.load('yard.png')
 
     def draw(self, win):
         if self.form == "trash":
-            win.blit(self.trashcan, (self.x, self.y))
+            win.blit(self.trash_can, (self.x, self.y))
         elif self.form == "recycle":
-            win.blit(self.recyclebin, (self.x, self.y))
+            win.blit(self.recycle_bin, (self.x, self.y))
         elif self.form == "garden":
-            win.blit(self.yardtrimmings, (self.x, self.y))
+            win.blit(self.yard_trimmings, (self.x, self.y))
 
     def change(self, form):
         self.form = form
@@ -96,7 +96,7 @@ class Game:
 
         self.points = 0
         self.stage = 0
-        self.mousedown = 0
+        self.mouse_down = 0
 
     # label variables
         self.game_label = Label("Trash Heroes", 32,
@@ -126,7 +126,7 @@ class Game:
 
         self.back_to_start = Label("Return to Title Screen", 20,
                                    (0, 0, 0), (255, 255, 255), 500, 700)
-        self.bgcolor = (255, 255, 255)
+        self.bg_color = (255, 255, 255)
         self.music = pygame.mixer.music.load("sound.mp3")
         pygame.mixer.music.play(-1)
         self.wrongsound = pygame.mixer.Sound("wrong.wav")
@@ -158,7 +158,7 @@ class Game:
 
     def rungame(self):
         while self.run:
-            win.fill(self.bgcolor)
+            win.fill(self.bg_color)
             pygame.time.delay(10)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -169,14 +169,14 @@ class Game:
             if self.stage == 0:
                 pygame.event.get()
                 if pygame.mouse.get_pressed() == (0, 0, 0):
-                    self.mousedown = 0
-                if pygame.mouse.get_pressed() == (1, 0, 0) and self.mousedown == 0:
-                    if self.instructions_label.inrect:
+                    self.mouse_down = 0
+                if pygame.mouse.get_pressed() == (1, 0, 0) and self.mouse_down == 0:
+                    if self.instructions_label.in_rect:
                         self.stage = 2
-                        self.instructions_label.inrect = False
-                    elif self.play_label.inrect:
+                        self.instructions_label.in_rect = False
+                    elif self.play_label.in_rect:
                         self.stage = 1
-                        self.play_again.inrect = False
+                        self.play_again.in_rect = False
                 self.instructions_label.checkcursor(
                     self.x, self.y, (0, 0, 255))
                 self.play_label.checkcursor(self.x, self.y, (0, 0, 255))
@@ -188,7 +188,7 @@ class Game:
             if self.stage == 2:
                 pygame.event.get()
                 if pygame.mouse.get_pressed() == (1, 0, 0):
-                    if self.play_label.inrect:
+                    if self.play_label.in_rect:
                         self.stage = 1
                 self.play_label.checkcursor(self.x, self.y, (0, 0, 255))
                 self.the_instructions.draw(win)
@@ -261,7 +261,7 @@ class Game:
             if self.stage == 3:
                 pygame.event.get()
                 if pygame.mouse.get_pressed() == (1, 0, 0):
-                    if self.play_again.inrect:
+                    if self.play_again.in_rect:
                         self.stage = 1
                         self.item_list = []
                         for i in range(30):
@@ -269,8 +269,8 @@ class Game:
                                 image(random.randrange(35, 885), -200 - 500*i))
                         self.can.change("trash")
                         self.points = 0
-                        self.play_again.inrect = False
-                    elif self.back_to_start.inrect:
+                        self.play_again.in_rect = False
+                    elif self.back_to_start.in_rect:
                         self.stage = 0
                         self.item_list = []
                         for i in range(30):
@@ -278,8 +278,8 @@ class Game:
                                 image(random.randrange(35, 885), -200 - 500*i))
                         self.can.change("trash")
                         self.points = 0
-                        self.mousedown = 1
-                        self.back_to_start.inrect = False
+                        self.mouse_down = 1
+                        self.back_to_start.in_rect = False
                 self.play_again.checkcursor(self.x, self.y, (0, 0, 255))
                 self.back_to_start.checkcursor(self.x, self.y, (0, 0, 255))
                 self.final_score.draw(win)
