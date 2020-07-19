@@ -17,7 +17,7 @@ GRAY = (128, 128, 128)
 width = 1000
 height = 900
 win = pygame.display.set_mode((width, height))
-pygame.display.set_caption("Where do I throw it?")
+pygame.display.set_caption("Trash Heroes")
 pygame.init()
 width/2
 
