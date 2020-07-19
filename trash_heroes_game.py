@@ -1,92 +1,11 @@
 import pygame
 import random
-import os
-import choose_picture
+from label_class import Label
+from item_class import Image
+from can_class import Can
 win = pygame.display.set_mode((1000, 900))
 pygame.display.set_caption("Where do I throw it?")
 pygame.init()
-
-
-class Label:
-    def __init__(self, text, size, color, bg_color, x, y):
-        self.text = text
-        self.size = size
-        self.font = pygame.font.SysFont('arial', size)
-        self.color = color
-        self.width, self.height = self.font.size(self.text)
-        self.bg_color = bg_color
-        self.label = self.font.render(self.text, True, color, self.bg_color)
-        self.rect = self.label.get_rect()
-        self.x = x
-        self.y = y
-        self.rect.center = (self.x, self.y)
-        self.in_rect = False
-
-    def draw(self, win):
-        win.blit(self.label, self.rect)
-
-    def checkcursor(self, x, y, color):
-        if x > self.x - self.width/2 and x < self.x + self.width/2:
-            if y > self.y - self.height/2 and y < self.y + self.height/2:
-                self.label = self.font.render(
-                    self.text, True, self.color, color)
-                self.in_rect = True
-            else:
-                self.label = self.font.render(
-                    self.text, True, self.color, self.bg_color)
-                self.in_rect = False
-        else:
-            self.label = self.font.render(
-                self.text, True, self.color, self.bg_color)
-            self.in_rect = False
-
-    def changetext(self, text):
-        self.label = self.font.render(text, True, self.color, self.bg_color)
-        self.rect = self.label.get_rect()
-        self.rect.center = (self.x, self.y)
-
-    def changecolor(self, color):
-        self.color = color
-        self.label = self.font.render(
-            self.text, True, self.color, self.bg_color)
-
-
-class image:
-    def __init__(self, x, y):
-
-        self.x = x
-        self.y = y
-
-        self.rad = 40
-
-        self.visible = True
-        self.path, self.index = choose_picture.getPic()
-        self.image = pygame.image.load(self.path)
-
-    def draw(self, win):
-        if self.visible:
-            win.blit(self.image, (self.x, self.y))
-
-
-class Can:
-    def __init__(self):
-        self.x = 400
-        self.y = 700
-        self.form = "trash"
-        self.trash_can = pygame.image.load('trashcan.png')
-        self.recycle_bin = pygame.image.load('recycle.png')
-        self.yard_trimmings = pygame.image.load('yard.png')
-
-    def draw(self, win):
-        if self.form == "trash":
-            win.blit(self.trash_can, (self.x, self.y))
-        elif self.form == "recycle":
-            win.blit(self.recycle_bin, (self.x, self.y))
-        elif self.form == "garden":
-            win.blit(self.yard_trimmings, (self.x, self.y))
-
-    def change(self, form):
-        self.form = form
 
 
 class Game:
@@ -135,7 +54,7 @@ class Game:
     # item creation
         for i in range(30):
             self.item_list.append(
-                image(random.randrange(35, 885), -200 - 500*i))
+                Image(random.randrange(35, 885), -200 - 500*i))
         self.can = Can()
         self.hitcan = self.item_list[0]
 
@@ -266,7 +185,7 @@ class Game:
                         self.item_list = []
                         for i in range(30):
                             self.item_list.append(
-                                image(random.randrange(35, 885), -200 - 500*i))
+                                Image(random.randrange(35, 885), -200 - 500*i))
                         self.can.change("trash")
                         self.points = 0
                         self.play_again.in_rect = False
@@ -275,7 +194,7 @@ class Game:
                         self.item_list = []
                         for i in range(30):
                             self.item_list.append(
-                                image(random.randrange(35, 885), -200 - 500*i))
+                                Image(random.randrange(35, 885), -200 - 500*i))
                         self.can.change("trash")
                         self.points = 0
                         self.mouse_down = 1
