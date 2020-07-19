@@ -45,6 +45,11 @@ class Label:
         self.rect = self.label.get_rect()
         self.rect.center = (self.x, self.y)
 
+    def changecolor(self, color):
+        self.color = color
+        self.label = self.font.render(
+            self.text, True, self.color, self.bgcolor)
+
 
 class image:
     def __init__(self, x, y):
@@ -54,12 +59,12 @@ class image:
 
         self.rad = 40
 
-        self.vis = True
+        self.visible = True
         self.path, self.index = randompictest.getPic()
         self.image = pygame.image.load(self.path)
 
     def draw(self, win):
-        if self.vis:
+        if self.visible:
             win.blit(self.image, (self.x, self.y))
 
 
@@ -103,7 +108,7 @@ class Game:
         self.the_instructions = Label("The Instructions", 32,
                                       (0, 0, 0), (255, 255, 255), 500, 200)
 
-        self.sentence1 = Label("The objective is to catch the falling items in the correct bin", 20,
+        self.sentence1 = Label("The objective is to catch the falling items in the correct bin.", 20,
                                (0, 0, 0), (255, 255, 255), 500, 350)
         self.sentence2 = Label("You can move the bin with the right and left arrows.", 20,
                                (0, 0, 0), (255, 255, 255), 500, 425)
@@ -128,6 +133,7 @@ class Game:
             self.item_list.append(
                 image(random.randrange(35, 885), -200 - 500*i))
         self.can = Can()
+        self.hitcan = self.item_list[0]
 
     def drawgame(self):
         for item in self.item_list:
@@ -136,6 +142,17 @@ class Game:
         self.score.changetext("Score: "+str(self.points))
         self.score.draw(win)
         pygame.display.update()
+
+    def correct(self):
+        self.points += 1
+        self.score.changecolor((0, 255, 0))
+        self.sound = pygame.mixer.music.load(
+            "correct.mp3")
+
+    def wrong(self):
+        self.score.changecolor((255, 0, 0))
+        self.sound = pygame.mixer.music.load(
+            "wrong.mp3")
 
     def rungame(self):
         while self.run:
@@ -194,34 +211,28 @@ class Game:
                     self.can.change("garden")
             # can touch conditions
                 for item in self.item_list:
-                    if item.y + 40 > 700 and item.y + 40 < 750 and item.vis:
+                    if item.y + 40 > 700 and item.y + 40 < 750 and item.visible:
                         if item.x > self.can.x and item.x < self.can.x + 170:
-                            item.vis = False
+                            item.visible = False
+                            self.hitcan = item
                             if self.can.form == "trash":
                                 if item.index == 0:
-                                    self.points += 1
-                                    right = pygame.mixer.music.load(
-                                        "correct.mp3")
+                                    self.correct()
                                 else:
-                                    wrong = pygame.mixer.music.load(
-                                        "wrong.mp3")
+                                    self.wrong()
                             if self.can.form == "recycle":
                                 if item.index == 1:
-                                    self.points += 1
-                                    right = pygame.mixer.music.load(
-                                        "correct.mp3")
+                                    self.correct()
                                 else:
-                                    wrong = pygame.mixer.music.load(
-                                        "wrong.mp3")
+                                    self.wrong()
                             if self.can.form == "garden":
                                 if item.index == 2:
-                                    self.points += 1
-                                    right = pygame.mixer.music.load(
-                                        "correct.mp3")
+                                    self.correct()
                                 else:
-                                    wrong = pygame.mixer.music.load(
-                                        "wrong.mp3")
+                                    self.wrong()
                             pygame.mixer.music.play()
+                    if self.hitcan.y > 900:
+                        self.score.changecolor((0, 0, 0))
             # difficulty increasing with skill
 
                 if self.item_list[5].y < 1000:
